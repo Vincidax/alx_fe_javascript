@@ -17,13 +17,16 @@ const newQuoteText = document.getElementById("newQuoteText");
 const newQuoteCategory = document.getElementById("newQuoteCategory");
 
 // --------------------
-// Show Random Quote
+// Display Random Quote
 // --------------------
-function showRandomQuote() {
+function displayRandomQuote() {
   const randomIndex = Math.floor(Math.random() * quotes.length);
   const quote = quotes[randomIndex];
 
-  quoteDisplay.textContent = `"${quote.text}" (${quote.category})`;
+  quoteDisplay.innerHTML = `
+    <p>"${quote.text}"</p>
+    <small>Category: ${quote.category}</small>
+  `;
 }
 
 // --------------------
@@ -43,16 +46,16 @@ function addQuote() {
   newQuoteText.value = "";
   newQuoteCategory.value = "";
 
-  showRandomQuote();
+  displayRandomQuote();
 }
 
 // --------------------
 // Event Listeners
 // --------------------
-newQuoteBtn.addEventListener("click", showRandomQuote);
+newQuoteBtn.addEventListener("click", displayRandomQuote);
 addQuoteBtn.addEventListener("click", addQuote);
 
 // --------------------
-// Initial Quote
+// Initial Display
 // --------------------
-showRandomQuote();
+displayRandomQuote();

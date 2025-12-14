@@ -53,7 +53,7 @@ function showRandomQuote() {
 }
 
 // --------------------
-// REQUIRED FUNCTION (RESTORED)
+// ADDQUOTEFORM  FUNCTION 
 // --------------------
 function createAddQuoteForm() {
   // Form already exists in HTML
@@ -61,7 +61,7 @@ function createAddQuoteForm() {
 }
 
 // --------------------
-// REQUIRED FUNCTION
+// ADDQUOTE FUNCTION
 // --------------------
 function addQuote() {
   const text = newQuoteText.value.trim();
@@ -86,6 +86,27 @@ function addQuote() {
 
   showRandomQuote();
 }
+
+// --------------------
+// Export Quotes to JSON
+// --------------------
+function exportToJsonFile() {
+  const jsonData = JSON.stringify(quotes, null, 2);
+
+  const blob = new Blob([jsonData], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = "quotes.json";
+
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+
+  URL.revokeObjectURL(url);
+}
+
 
 // --------------------
 // EVENT LISTENERS

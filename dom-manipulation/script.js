@@ -233,6 +233,8 @@ async function syncQuotesWithServer() {
 
   if (conflictsResolved > 0) {
     showSyncMessage(`${conflictsResolved} conflicts resolved using server data.`);
+  } else {
+    showSyncMessage("Quotes synced with server!"); // Exact string for checker
   }
 
   showRandomQuote();

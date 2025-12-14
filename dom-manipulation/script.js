@@ -61,7 +61,6 @@ function saveLastViewedQuote(quote) {
 function populateCategories() {
   const uniqueCategories = [...new Set(quotes.map(q => q.category))];
 
-  // Clear existing options except "All Categories"
   categoryFilter.innerHTML = '<option value="all">All Categories</option>';
 
   uniqueCategories.forEach(cat => {
@@ -71,7 +70,7 @@ function populateCategories() {
     categoryFilter.appendChild(option);
   });
 
-  loadLastFilter(); // Restore last selected filter
+  loadLastFilter();
 }
 
 // --------------------
@@ -125,7 +124,7 @@ function addQuote() {
   quotes.push(newQuote);
   saveQuotes();
 
-  populateCategories(); // Update dropdown
+  populateCategories();
 
   newQuoteText.value = "";
   newQuoteCategory.value = "";
@@ -240,6 +239,28 @@ async function syncQuotesWithServer() {
 }
 
 // --------------------
+// Post Local Quotes to Server
+// --------------------
+async function postQuotesToServer() {
+  try {
+    const response = await fetch(SERVER_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(quotes)
+    });
+
+    if (!response.ok) throw new Error(`Server responded with status ${response.status}`);
+
+    const result = await response.json();
+    console.log("Quotes posted to server:", result);
+
+    showSyncMessage("Local quotes successfully posted to server!");
+  } catch (error) {
+    console.error("Error posting quotes to server:", error);
+  }
+}
+
+// --------------------
 // Show Sync/Conflict Message
 // --------------------
 function showSyncMessage(message) {
@@ -257,18 +278,22 @@ function showSyncMessage(message) {
 // --------------------
 newQuoteBtn.addEventListener("click", showRandomQuote);
 addQuoteBtn.addEventListener("click", addQuote);
-
-// Filter dropdown
 categoryFilter.addEventListener("change", filterQuotes);
 
 // --------------------
-// Manual Sync Button
+// Manual Sync & Post Buttons
 // --------------------
 const syncBtn = document.createElement("button");
 syncBtn.textContent = "Sync with Server";
 syncBtn.style.marginLeft = "10px";
 syncBtn.onclick = syncQuotesWithServer;
 document.body.insertBefore(syncBtn, quoteDisplay);
+
+const postBtn = document.createElement("button");
+postBtn.textContent = "Post Quotes to Server";
+postBtn.style.marginLeft = "10px";
+postBtn.onclick = postQuotesToServer;
+document.body.insertBefore(postBtn, quoteDisplay);
 
 // --------------------
 // Periodic Sync (every 60 sec)

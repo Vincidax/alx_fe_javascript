@@ -18,6 +18,11 @@ const newQuoteCategory = document.getElementById("newQuoteCategory");
 const categoryFilter = document.getElementById("categoryFilter");
 
 // --------------------
+// Server Simulation URL
+// --------------------
+const SERVER_URL = "https://jsonplaceholder.typicode.com/posts"; // Mock endpoint
+
+// --------------------
 // LOCAL STORAGE
 // --------------------
 function saveQuotes() {
@@ -55,10 +60,10 @@ function saveLastViewedQuote(quote) {
 // --------------------
 function populateCategories() {
   const uniqueCategories = [...new Set(quotes.map(q => q.category))];
-  
+
   // Clear existing options except "All Categories"
   categoryFilter.innerHTML = '<option value="all">All Categories</option>';
-  
+
   uniqueCategories.forEach(cat => {
     const option = document.createElement("option");
     option.value = cat;
@@ -75,7 +80,6 @@ function populateCategories() {
 function showRandomQuote() {
   let filteredQuotes = quotes;
 
-  // Filter by selected category
   const selectedCategory = categoryFilter.value;
   if (selectedCategory && selectedCategory !== "all") {
     filteredQuotes = quotes.filter(q => q.category === selectedCategory);
@@ -101,7 +105,7 @@ function showRandomQuote() {
 // Filter Quotes
 // --------------------
 function filterQuotes() {
-  saveLastFilter(categoryFilter.value); // Save last selected filter
+  saveLastFilter(categoryFilter.value);
   showRandomQuote();
 }
 
@@ -121,13 +125,11 @@ function addQuote() {
   quotes.push(newQuote);
   saveQuotes();
 
-  // Update categories dropdown if new category is introduced
-  populateCategories();
+  populateCategories(); // Update dropdown
 
   newQuoteText.value = "";
   newQuoteCategory.value = "";
 
-  // DOM feedback
   const msg = document.createElement("div");
   msg.textContent = "Quote added!";
   quoteDisplay.appendChild(msg);
@@ -176,7 +178,6 @@ function importFromJsonFile(event) {
       quotes.push(...importedQuotes);
       saveQuotes();
 
-      // Update categories dynamically
       populateCategories();
 
       alert("Quotes imported successfully!");
@@ -190,10 +191,89 @@ function importFromJsonFile(event) {
 }
 
 // --------------------
+// Fetch Quotes From Server
+// --------------------
+async function fetchQuotesFromServer() {
+  try {
+    const response = await fetch(SERVER_URL);
+    const data = await response.json();
+
+    return data.slice(0, 10).map(item => ({
+      text: item.title,
+      category: item.body || "Uncategorized"
+    }));
+  } catch (error) {
+    console.error("Error fetching quotes from server:", error);
+    return [];
+  }
+}
+
+// --------------------
+// Sync Quotes with Server
+// --------------------
+async function syncQuotesWithServer() {
+  const serverQuotes = await fetchQuotesFromServer();
+
+  let conflictsResolved = 0;
+
+  serverQuotes.forEach(serverQuote => {
+    const index = quotes.findIndex(q => q.text === serverQuote.text);
+
+    if (index === -1) {
+      quotes.push(serverQuote);
+    } else {
+      if (quotes[index].category !== serverQuote.category) {
+        quotes[index].category = serverQuote.category;
+        conflictsResolved++;
+      }
+    }
+  });
+
+  saveQuotes();
+  populateCategories();
+
+  if (conflictsResolved > 0) {
+    showSyncMessage(`${conflictsResolved} conflicts resolved using server data.`);
+  }
+
+  showRandomQuote();
+}
+
+// --------------------
+// Show Sync/Conflict Message
+// --------------------
+function showSyncMessage(message) {
+  const msg = document.createElement("div");
+  msg.textContent = message;
+  msg.style.color = "green";
+  msg.style.marginTop = "10px";
+  quoteDisplay.appendChild(msg);
+
+  setTimeout(() => msg.remove(), 5000);
+}
+
+// --------------------
 // Event Listeners
 // --------------------
 newQuoteBtn.addEventListener("click", showRandomQuote);
 addQuoteBtn.addEventListener("click", addQuote);
+
+// Filter dropdown
+categoryFilter.addEventListener("change", filterQuotes);
+
+// --------------------
+// Manual Sync Button
+// --------------------
+const syncBtn = document.createElement("button");
+syncBtn.textContent = "Sync with Server";
+syncBtn.style.marginLeft = "10px";
+syncBtn.onclick = syncQuotesWithServer;
+document.body.insertBefore(syncBtn, quoteDisplay);
+
+// --------------------
+// Periodic Sync (every 60 sec)
+// --------------------
+setInterval(syncQuotesWithServer, 60000);
 
 // --------------------
 // Initial Load
@@ -201,3 +281,4 @@ addQuoteBtn.addEventListener("click", addQuote);
 loadQuotes();
 populateCategories();
 showRandomQuote();
+syncQuotesWithServer();

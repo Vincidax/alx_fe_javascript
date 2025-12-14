@@ -17,7 +17,7 @@ const newQuoteText = document.getElementById("newQuoteText");
 const newQuoteCategory = document.getElementById("newQuoteCategory");
 
 // --------------------
-// REQUIRED FUNCTION NAME
+// REQUIRED FUNCTION
 // --------------------
 function showRandomQuote() {
   const randomIndex = Math.floor(Math.random() * quotes.length);
@@ -30,7 +30,16 @@ function showRandomQuote() {
 }
 
 // --------------------
-// Add Quote
+// REQUIRED FUNCTION
+// --------------------
+function createAddQuoteForm() {
+  // Form already exists in HTML
+  // This function wires the button to the addQuote logic
+  addQuoteBtn.addEventListener("click", addQuote);
+}
+
+// --------------------
+// REQUIRED FUNCTION
 // --------------------
 function addQuote() {
   const text = newQuoteText.value.trim();
@@ -53,9 +62,9 @@ function addQuote() {
 // Event Listeners
 // --------------------
 newQuoteBtn.addEventListener("click", showRandomQuote);
-addQuoteBtn.addEventListener("click", addQuote);
 
 // --------------------
-// Initial Quote
+// Initial Setup
 // --------------------
+createAddQuoteForm();
 showRandomQuote();

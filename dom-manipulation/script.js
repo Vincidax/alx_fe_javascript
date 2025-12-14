@@ -107,6 +107,37 @@ function exportToJsonFile() {
   URL.revokeObjectURL(url);
 }
 
+// --------------------
+// Import Quotes from JSON
+// --------------------
+function importFromJsonFile(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+
+  reader.onload = function(e) {
+    try {
+      const importedQuotes = JSON.parse(e.target.result);
+
+      if (!Array.isArray(importedQuotes)) {
+        alert("Invalid JSON format: must be an array of quotes.");
+        return;
+      }
+
+      quotes.push(...importedQuotes);
+      localStorage.setItem("quotes", JSON.stringify(quotes));
+
+      alert("Quotes imported successfully!");
+      showRandomQuote();
+    } catch (error) {
+      alert("Error reading JSON file: " + error.message);
+    }
+  };
+
+  reader.readAsText(file);
+}
+
 
 // --------------------
 // EVENT LISTENERS

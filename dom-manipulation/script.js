@@ -17,9 +17,9 @@ const newQuoteText = document.getElementById("newQuoteText");
 const newQuoteCategory = document.getElementById("newQuoteCategory");
 
 // --------------------
-// Display Random Quote
+// REQUIRED FUNCTION NAME
 // --------------------
-function displayRandomQuote() {
+function showRandomQuote() {
   const randomIndex = Math.floor(Math.random() * quotes.length);
   const quote = quotes[randomIndex];
 
@@ -46,16 +46,16 @@ function addQuote() {
   newQuoteText.value = "";
   newQuoteCategory.value = "";
 
-  displayRandomQuote();
+  showRandomQuote();
 }
 
 // --------------------
 // Event Listeners
 // --------------------
-newQuoteBtn.addEventListener("click", displayRandomQuote);
+newQuoteBtn.addEventListener("click", showRandomQuote);
 addQuoteBtn.addEventListener("click", addQuote);
 
 // --------------------
-// Initial Display
+// Initial Quote
 // --------------------
-displayRandomQuote();
+showRandomQuote();
